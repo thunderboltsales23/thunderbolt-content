@@ -68,10 +68,17 @@ export async function generateWeeklyContent(): Promise<WeeklyCalendar> {
 
   console.log(`\n⚡ Generating content — theme: ${THEME_LABELS[theme]}`);
 
-  const response = await axios.post(GEMINI_URL, {
-    contents: [{ parts: [{ text: buildPrompt(theme) }] }],
-    generationConfig: { temperature: 0.8, maxOutputTokens: 4096 }
-  });
+  console.log('Calling Gemini URL:', GEMINI_URL.replace(GEMINI_API_KEY, 'KEY_HIDDEN'));
+  let response;
+  try {
+    response = await axios.post(GEMINI_URL, {
+      contents: [{ parts: [{ text: buildPrompt(theme) }] }],
+      generationConfig: { temperature: 0.8, maxOutputTokens: 4096 }
+    });
+  } catch (err: any) {
+    console.error('Gemini error:', err.response?.status, JSON.stringify(err.response?.data));
+    throw err;
+  }
 
   const rawText = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   const clean = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
