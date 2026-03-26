@@ -3,7 +3,7 @@ import { Post, WeeklyCalendar, ContentTheme, THEME_LABELS, POST_SCHEDULE, THEME_
 import * as crypto from 'crypto';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
 const TRAP_BOT_URL = process.env.TRAP_BOT_URL || 'https://thunderboltsalessystems.com/start';
 
 export function getCurrentTheme(): ContentTheme {
