@@ -2,8 +2,7 @@ import axios from 'axios';
 import { Post, WeeklyCalendar, ContentTheme, THEME_LABELS, POST_SCHEDULE, THEME_CYCLE } from './types';
 import * as crypto from 'crypto';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const TRAP_BOT_URL = process.env.TRAP_BOT_URL || 'https://thunderboltsalessystems.com/start';
 
 export function getCurrentTheme(): ContentTheme {
@@ -68,19 +67,23 @@ export async function generateWeeklyContent(): Promise<WeeklyCalendar> {
 
   console.log(`\n⚡ Generating content — theme: ${THEME_LABELS[theme]}`);
 
-  console.log('Calling Gemini URL:', GEMINI_URL.replace(GEMINI_API_KEY, 'KEY_HIDDEN'));
-  let response;
-  try {
-    response = await axios.post(GEMINI_URL, {
-      contents: [{ parts: [{ text: buildPrompt(theme) }] }],
-      generationConfig: { temperature: 0.8, maxOutputTokens: 4096 }
-    });
-  } catch (err: any) {
-    console.error('Gemini error:', err.response?.status, JSON.stringify(err.response?.data));
-    throw err;
-  }
+  const response = await axios.post(
+    'https://api.anthropic.com/v1/messages',
+    {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: buildPrompt(theme) }],
+    },
+    {
+      headers: {
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+    }
+  );
 
-  const rawText = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const rawText = response.data.content?.[0]?.text || '';
   const clean = rawText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
   const rawPosts = JSON.parse(clean);
 
