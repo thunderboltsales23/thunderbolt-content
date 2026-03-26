@@ -1,0 +1,12 @@
+[build]
+buildCommand = "npm install && npx tsc --skipLibCheck"
+
+[deploy]
+startCommand = "node dist/server.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[[cronJobs]]
+name = "weekly-content-generation"
+schedule = "0 10 * * 1"
+command = "node dist/index.js"
